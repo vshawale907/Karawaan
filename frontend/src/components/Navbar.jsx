@@ -9,7 +9,7 @@ const navLinks = [
   { label: 'Services', path: '/services' },
   { label: 'Contact', path: '/contact' },
   { label: 'Inquiry', path: '/inquiry' },
-  { label: 'B2B Survey', path: '/b2b-survey' },
+  { label: 'Partner Portal', path: '/login' },
 ];
 
 export default function Navbar() {

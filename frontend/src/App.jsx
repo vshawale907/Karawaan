@@ -7,19 +7,12 @@ import AboutPage from './pages/AboutPage';
 import ServicesPage from './pages/ServicesPage';
 import ContactPage from './pages/ContactPage';
 import InquiryPage from './pages/InquiryPage';
-import B2BSurveyPage from './pages/B2BSurveyPage';
 
 // Admin Pages
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AllInquiries from './pages/admin/AllInquiries';
 import B2BSurveys from './pages/admin/B2BSurveys';
-
-// Agent Pages
-import AgentLayout from './pages/agent/AgentLayout';
-import AgentDashboard from './pages/agent/AgentDashboard';
-import AgentInquiryForm from './pages/agent/AgentInquiryForm';
-import AgentInquiriesList from './pages/agent/AgentInquiriesList';
 
 // Shared / Dynamic Pages
 import LoginPage from './pages/LoginPage';
@@ -67,20 +60,10 @@ function AnimatedRoutes() {
         <Route path="/services" element={<PublicLayout><ServicesPage /></PublicLayout>} />
         <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
         <Route path="/inquiry" element={<PublicLayout><InquiryPage /></PublicLayout>} />
-        <Route path="/b2b-survey" element={<PublicLayout><B2BSurveyPage /></PublicLayout>} />
         
         {/* Mock Login/Register Pages */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-
-        {/* B2B Travel Agent Portal */}
-        <Route path="/agent" element={<AgentLayout />}>
-          <Route index element={<AgentDashboard />} />
-          <Route path="inquiry/new" element={<AgentInquiryForm />} />
-          <Route path="inquiries" element={<AgentInquiriesList />} />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
 
         {/* Administrator Portal */}
         <Route path="/admin" element={<AdminLayout />}>

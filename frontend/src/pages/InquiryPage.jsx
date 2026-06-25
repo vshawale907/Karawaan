@@ -1,25 +1,29 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, CheckCircle2, MapPin, Calendar, Users, Hotel, Car, User, FileText } from 'lucide-react';
+import { Send, CheckCircle2, MapPin, Calendar, Users, Hotel, Car, User, FileText, Plus, X } from 'lucide-react';
 import { FadeUp } from '../components/ui';
 
 const hotelCategories = ['3 Star', '4 Star', '5 Star', 'Luxury Safari Lodge'];
 const transportOptions = ['Need Private Vehicle', 'Shared Transport', 'Need Recommendation'];
 
 const emptyForm = {
-  destination: '',
+  destinations: [{ name: '', city: '', country: '', nights: '' }],
   dateFrom: '',
-  nights: '',
   adults: '',
   children: '',
   childrenAges: '',
   roomRequirement: '',
   hotelCategory: [],
   transport: '',
+  agencyName: '',
   agentName: '',
   clientName: '',
   contactNumber: '',
   email: '',
+  operationHeadName: '',
+  operationHeadContact: '',
+  ownerName: '',
+  ownerContact: '',
   requirements: '',
 };
 
@@ -30,6 +34,25 @@ export default function InquiryPage() {
   const [inquiryId, setInquiryId] = useState('');
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
+
+  const handleDestinationChange = (index, field, value) => {
+    setForm(f => {
+      const newDestinations = [...f.destinations];
+      newDestinations[index] = { ...newDestinations[index], [field]: value };
+      return { ...f, destinations: newDestinations };
+    });
+  };
+
+  const addDestination = () => {
+    setForm(f => ({ ...f, destinations: [...f.destinations, { name: '', city: '', country: '', nights: '' }] }));
+  };
+
+  const removeDestination = (index) => {
+    setForm(f => ({
+      ...f,
+      destinations: f.destinations.filter((_, i) => i !== index)
+    }));
+  };
 
   const handleCheckbox = (category) => {
     setForm(f => {
@@ -84,8 +107,8 @@ export default function InquiryPage() {
 
           <div className="pt-6 border-t border-white/5">
             <p className="text-white/40 text-[10px] uppercase tracking-wider mb-3">Partner with us</p>
-            <a href="/b2b-survey" className="btn-primary w-full text-xs py-3 text-center block">
-              Take B2B Partnership Survey
+            <a href="/register" className="btn-primary w-full text-xs py-3 text-center block">
+              Register as Partner <ArrowRight size={14} className="inline ml-1" />
             </a>
           </div>
         </motion.div>
@@ -112,22 +135,55 @@ export default function InquiryPage() {
                 <MapPin size={18} className="text-gold" />
                 <h2 className="text-white font-semibold text-lg">Destination & Travel Dates</h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div className="lg:col-span-2">
-                  <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Destination *</label>
-                  <input required value={form.destination} onChange={e => set('destination', e.target.value)}
-                    placeholder="e.g. Masai Mara, Dubai, Bali" className="input-luxury" />
-                </div>
-                <div>
-                  <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Travel Date *</label>
-                  <input required type="date" value={form.dateFrom} onChange={e => set('dateFrom', e.target.value)}
-                    className="input-luxury" />
-                </div>
-                <div>
-                  <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Number of Nights *</label>
-                  <input required type="number" min="1" value={form.nights} onChange={e => set('nights', e.target.value)}
-                    placeholder="e.g. 3" className="input-luxury" />
-                </div>
+              
+              <div className="mb-6">
+                <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Travel Start Date *</label>
+                <input required type="date" value={form.dateFrom} onChange={e => set('dateFrom', e.target.value)}
+                  className="input-luxury max-w-xs" />
+              </div>
+
+              <div className="space-y-4">
+                {form.destinations.map((dest, index) => (
+                  <div key={index} className="bg-white/5 p-5 rounded-xl border border-white/5 relative">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-white font-medium text-sm">Destination {index + 1}</h3>
+                      {form.destinations.length > 1 && (
+                        <button type="button" onClick={() => removeDestination(index)} className="text-red-400/70 hover:text-red-400 p-1.5 transition-colors bg-red-400/10 rounded-md hover:bg-red-400/20">
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Destination / Attraction *</label>
+                        <input required value={dest.name} onChange={e => handleDestinationChange(index, 'name', e.target.value)}
+                          placeholder="e.g. Masai Mara" className="input-luxury" />
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-4 items-start">
+                        <div className="flex-1 w-full">
+                          <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">City *</label>
+                          <input required value={dest.city} onChange={e => handleDestinationChange(index, 'city', e.target.value)}
+                            placeholder="e.g. Nairobi" className="input-luxury" />
+                        </div>
+                        <div className="flex-1 w-full">
+                          <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Country *</label>
+                          <input required value={dest.country} onChange={e => handleDestinationChange(index, 'country', e.target.value)}
+                            placeholder="e.g. Kenya" className="input-luxury" />
+                        </div>
+                        <div className="w-full sm:w-32">
+                          <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Nights *</label>
+                          <input required type="number" min="1" value={dest.nights} onChange={e => handleDestinationChange(index, 'nights', e.target.value)}
+                            placeholder="e.g. 3" className="input-luxury" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                <button type="button" onClick={addDestination} className="text-gold text-xs flex items-center gap-2 hover:text-gold/80 transition-colors mt-4 py-2 px-4 rounded-lg bg-gold/10 hover:bg-gold/20 w-fit">
+                  <Plus size={14} />
+                  Add Another Destination
+                </button>
               </div>
             </div>
 
@@ -187,8 +243,8 @@ export default function InquiryPage() {
                 <div>
                   <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Transport Requirement *</label>
                   <select required value={form.transport} onChange={e => set('transport', e.target.value)} className="input-luxury">
-                    <option value="" disabled>Select transport option</option>
-                    {transportOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    <option value="" disabled className="bg-obsidian text-white">Select transport option</option>
+                    {transportOptions.map(opt => <option key={opt} value={opt} className="bg-obsidian text-white">{opt}</option>)}
                   </select>
                 </div>
               </div>
@@ -200,22 +256,54 @@ export default function InquiryPage() {
                 <User size={18} className="text-gold" />
                 <h2 className="text-white font-semibold text-lg">Contact Details</h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Travel Agent Name *</label>
-                  <input required value={form.agentName} onChange={e => set('agentName', e.target.value)} placeholder="Agent Name" className="input-luxury" />
+              
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Travel Agency Name *</label>
+                    <input required value={form.agencyName} onChange={e => set('agencyName', e.target.value)} placeholder="Agency Name" className="input-luxury" />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Travel Agent Name *</label>
+                    <input required value={form.agentName} onChange={e => set('agentName', e.target.value)} placeholder="Agent Name" className="input-luxury" />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Client Name *</label>
-                  <input required value={form.clientName} onChange={e => set('clientName', e.target.value)} placeholder="Client Name" className="input-luxury" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Operation Head Name *</label>
+                    <input required value={form.operationHeadName} onChange={e => set('operationHeadName', e.target.value)} placeholder="Head Name" className="input-luxury" />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Operation Head Contact Number *</label>
+                    <input required type="tel" value={form.operationHeadContact} onChange={e => set('operationHeadContact', e.target.value)} placeholder="+91" className="input-luxury" />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Contact Number *</label>
-                  <input required type="tel" value={form.contactNumber} onChange={e => set('contactNumber', e.target.value)} placeholder="+91" className="input-luxury" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Owner Name *</label>
+                    <input required value={form.ownerName} onChange={e => set('ownerName', e.target.value)} placeholder="Owner Name" className="input-luxury" />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Owner Contact Number *</label>
+                    <input required type="tel" value={form.ownerContact} onChange={e => set('ownerContact', e.target.value)} placeholder="+91" className="input-luxury" />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Email Address *</label>
-                  <input required type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="email@example.com" className="input-luxury" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 border-t border-white/5 pt-6">
+                  <div>
+                    <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Client Name *</label>
+                    <input required value={form.clientName} onChange={e => set('clientName', e.target.value)} placeholder="Client Name" className="input-luxury" />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Client Contact Number *</label>
+                    <input required type="tel" value={form.contactNumber} onChange={e => set('contactNumber', e.target.value)} placeholder="+91" className="input-luxury" />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Client Email Address *</label>
+                    <input required type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="email@example.com" className="input-luxury" />
+                  </div>
                 </div>
               </div>
             </div>

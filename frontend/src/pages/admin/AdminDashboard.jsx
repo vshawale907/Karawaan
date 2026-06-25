@@ -7,10 +7,10 @@ import {
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, Legend
+  ResponsiveContainer, Legend
 } from 'recharts';
 import { useApp } from '../../context/AppContext';
-import { partners, chartData, destinationStats } from '../../data/dummyData';
+import { partners, chartData } from '../../data/dummyData';
 
 const COLORS = ['#C9A84C', '#2D6A4F', '#A07B2E', '#ECFDF5', '#F4E0A1'];
 
@@ -47,10 +47,6 @@ export default function AdminDashboard() {
   const pending = inquiries.filter(i => i.status === 'pending' || i.status === 'new').length;
   const completed = inquiries.filter(i => i.status === 'approved' || i.status === 'closed').length;
   
-  // Calculate mock revenue: completed deals * average price (₹1.5L)
-  const mockRevenue = completed * 150000 + 1200000;
-  const formattedRevenue = `₹${(mockRevenue / 10000000).toFixed(2)}Cr`;
-
   const recentInquiries = inquiries.slice(0, 5);
 
   return (
@@ -71,17 +67,16 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard label="Total Inquiries" value={total} sub="+18% this month" icon={Inbox} trend={18} color="bg-gold" />
         <StatCard label="Pending Approval" value={pending} sub="Require attention" icon={AlertCircle} trend={5} color="bg-orange-500" />
         <StatCard label="Deals Completed" value={completed} sub="Target finalized" icon={CheckCircle2} trend={22} color="bg-emerald-500" />
-        <StatCard label="Processed Revenue" value={formattedRevenue} sub="B2B volume volume" icon={TrendingUp} trend={31} color="bg-blue-500" />
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Area Chart */}
-        <div className="lg:col-span-2 glass-card-dark p-6">
+        <div className="glass-card-dark p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="font-semibold text-slate-800 dark:text-white text-sm">Inquiry & Closure Trends</h3>
@@ -117,38 +112,6 @@ export default function AdminDashboard() {
                 <Area type="monotone" dataKey="closed" name="Deals Finalized" stroke="#2D6A4F" strokeWidth={2} fill="url(#colorClosed)" />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Pie Chart */}
-        <div className="glass-card-dark p-6">
-          <h3 className="font-semibold text-slate-800 dark:text-white text-sm mb-1">Top Destinations</h3>
-          <p className="text-slate-400 dark:text-white/30 text-xs mb-4">Inquiry distribution metrics</p>
-          
-          <div className="h-44 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={destinationStats} cx="50%" cy="50%" innerRadius={45} outerRadius={65}
-                  dataKey="value" paddingAngle={3}>
-                  {destinationStats.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(v) => `${v}%`} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          
-          <div className="space-y-2 mt-4">
-            {destinationStats.map((d, i) => (
-              <div key={d.name} className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i] }} />
-                  <span className="text-slate-500 dark:text-white/50">{d.name}</span>
-                </div>
-                <span className="text-slate-800 dark:text-white/70 font-semibold">{d.value}%</span>
-              </div>
-            ))}
           </div>
         </div>
       </div>

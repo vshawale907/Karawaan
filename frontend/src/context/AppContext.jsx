@@ -22,8 +22,8 @@ export function AppProvider({ children }) {
           email: payload.email,
           role: payload.role,
           name: payload.name,
-          agencyName: payload.agencyName,
-          phone: payload.phone,
+          companyName: payload.companyName,
+          founderContact: payload.founderContact,
           avatar: payload.avatar,
         };
         // Ensure admin always shows correct name
@@ -142,18 +142,18 @@ export function AppProvider({ children }) {
     return token;
   };
 
-  // Register new user
+  // Register new user (mocked token for frontend auth state after successful backend creation)
   const register = (userData) => {
-    const { name, email, phone, agencyName, role } = userData;
-    // Ensure admin role enforces Rushikesh Deshmukh
-    const finalName = role === 'admin' ? 'Rushikesh Deshmukh' : name;
+    const { founderName, email, companyName, role, founderContact } = userData;
+    // Ensure admin role enforces Rushikesh Deshmukh, or use founderName
+    const finalName = role === 'admin' ? 'Rushikesh Deshmukh' : founderName;
     
     let userDetails = {
       email,
       role,
       name: finalName,
-      agencyName: role === 'admin' ? 'Karawaan Corporate' : agencyName,
-      phone,
+      companyName: role === 'admin' ? 'Karawaan Corporate' : companyName,
+      founderContact: founderContact || '',
       avatar: role === 'admin' ? 'RD' : finalName.substring(0, 2).toUpperCase(),
     };
 

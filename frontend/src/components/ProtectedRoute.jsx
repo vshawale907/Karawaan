@@ -20,7 +20,6 @@ export default function ProtectedRoute({ role, children }) {
   // Wrong role → redirect to their correct home
   if (role && currentUser.role !== role) {
     if (currentUser.role === 'admin') return <Navigate to="/admin" replace />;
-    if (currentUser.role === 'agent') return <Navigate to="/agent" replace />;
     return <Navigate to="/" replace />;
   }
 

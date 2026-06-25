@@ -4,14 +4,6 @@ import { User, Mail, Phone, Building2, MapPin, ShieldCheck, Check } from 'lucide
 import { useApp } from '../../context/AppContext';
 import { generateToken, storeToken } from '../../utils/jwt';
 
-const avatarColors = [
-  'bg-gold',
-  'bg-emerald-500',
-  'bg-blue-500',
-  'bg-purple-500',
-  'bg-rose-500',
-];
-
 export default function ProfilePage() {
   const { currentUser, showToast } = useApp();
 
@@ -19,9 +11,6 @@ export default function ProfilePage() {
   const [email, setEmail] = useState(currentUser?.email || '');
   const [phone, setPhone] = useState(currentUser?.phone || '');
   const [agencyName, setAgencyName] = useState(currentUser?.agencyName || '');
-  const [address, setAddress] = useState('12, Nariman Point, Mumbai, Maharashtra 400021');
-  
-  const [selectedColor, setSelectedColor] = useState('bg-gold');
   const [loading, setLoading] = useState(false);
 
   const handleSave = (e) => {
@@ -59,12 +48,12 @@ export default function ProfilePage() {
         <div className="lg:col-span-1 flex flex-col gap-6">
           <div className="glass-card p-8 text-center flex flex-col h-full relative overflow-hidden">
             {/* Decorative background glow */}
-            <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 blur-[60px] opacity-20 ${selectedColor}`} />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 blur-[60px] opacity-20 bg-gold" />
 
             <div className="relative z-10">
               {/* Avatar block */}
               <div className="relative inline-block mb-5">
-                <div className={`w-28 h-28 rounded-full ${selectedColor} flex items-center justify-center font-display font-bold text-5xl text-obsidian shadow-xl mx-auto ring-4 ring-white/5`}>
+                <div className="w-28 h-28 rounded-full bg-gold flex items-center justify-center font-display font-bold text-5xl text-obsidian shadow-xl mx-auto ring-4 ring-white/5">
                   {currentUser?.avatar || 'U'}
                 </div>
                 <span className="absolute bottom-1 right-2 w-7 h-7 rounded-full bg-emerald-500 border-[3px] border-obsidian flex items-center justify-center text-white shadow-lg">
@@ -91,28 +80,10 @@ export default function ProfilePage() {
                   <Building2 size={16} className="text-gold mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <span className="block text-[10px] uppercase tracking-wider text-slate-400 dark:text-white/40 mb-0.5">Associated Agency</span>
-                    <strong className="text-slate-800 dark:text-white font-medium break-words leading-tight block pr-2">{agencyName}</strong>
+                    <strong className="text-slate-800 dark:text-white font-medium break-words leading-tight block pr-2">Karwaan Trails and Sfaris</strong>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Change Avatar color */}
-          <div className="glass-card p-6">
-            <h4 className="text-[10px] font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest mb-4 text-center">
-              Avatar Aesthetics
-            </h4>
-            <div className="flex justify-center gap-3">
-              {avatarColors.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className={`w-8 h-8 rounded-full ${color} cursor-pointer transition-all ${
-                    selectedColor === color ? 'scale-110 ring-2 ring-gold ring-offset-2 ring-offset-obsidian shadow-[0_0_15px_rgba(201,168,76,0.3)]' : 'hover:scale-110 opacity-70 hover:opacity-100'
-                  }`}
-                />
-              ))}
             </div>
           </div>
         </div>
@@ -189,22 +160,6 @@ export default function ProfilePage() {
                     required
                     value={agencyName}
                     onChange={(e) => setAgencyName(e.target.value)}
-                    className="input-luxury pl-12 py-3 bg-white/5 focus:bg-white/10"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="text-slate-400 dark:text-white/50 text-[10px] font-bold tracking-widest uppercase block mb-2">
-                  Office Address
-                </label>
-                <div className="relative">
-                  <MapPin size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/30" />
-                  <input
-                    type="text"
-                    required
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
                     className="input-luxury pl-12 py-3 bg-white/5 focus:bg-white/10"
                   />
                 </div>

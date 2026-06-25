@@ -47,7 +47,7 @@ export default function AdminLayout() {
     if (!currentUser) {
       navigate('/login');
     } else if (currentUser.role !== 'admin') {
-      navigate('/agent');
+      navigate('/');
     }
   }, [currentUser, navigate]);
 
@@ -269,7 +269,7 @@ export default function AdminLayout() {
                     {currentUser.name}
                   </span>
                   <span className="text-[9px] text-slate-400 dark:text-white/40 mt-0.5">
-                    {currentUser.role === 'admin' ? 'Administrator' : 'Travel Agent'}
+                    Administrator
                   </span>
                 </div>
               </button>

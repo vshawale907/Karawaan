@@ -1,17 +1,25 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { User, ShieldAlert, ArrowRight, Mail, Lock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, ShieldAlert, ArrowRight, Mail, Lock, KeyRound, CheckCircle2, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import API_BASE_URL from '../config/api';
 
 export default function LoginPage() {
   const { login, theme } = useApp();
   const navigate = useNavigate();
-  const [role, setRole] = useState('agent');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loginType, setLoginType] = useState('agent'); // 'agent' | 'admin'
+
+  // Forgot password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotError, setForgotError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,34 +37,58 @@ export default function LoginPage() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      login(email, password, role);
-      if (role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/agent');
-      }
+      login(email, password, loginType);
+      navigate(loginType === 'admin' ? '/admin' : '/dashboard');
     }, 1500);
   };
 
-  const handleQuickLogin = (selectedRole) => {
+  const handleQuickLogin = (type) => {
     setError('');
     setLoading(true);
-    const mockEmail = 'rushikesh5953@gmail.com';
+    setLoginType(type);
+    
+    // In a real app, these would be separate demo accounts
+    const mockEmail = type === 'admin' ? 'admin@karawaan.com' : 'agent@travel.com';
     const mockPassword = 'password123';
     
     setEmail(mockEmail);
     setPassword(mockPassword);
-    setRole(selectedRole);
 
     setTimeout(() => {
       setLoading(false);
-      login(mockEmail, mockPassword, selectedRole);
-      if (selectedRole === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/agent');
-      }
+      login(mockEmail, mockPassword, type);
+      navigate(type === 'admin' ? '/admin' : '/dashboard');
     }, 1200);
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotError('');
+    
+    if (!forgotEmail) {
+      setForgotError('Please enter your email address');
+      return;
+    }
+
+    setForgotLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setForgotError(data.message || 'Failed to send reset email');
+        setForgotLoading(false);
+        return;
+      }
+      setForgotSent(true);
+    } catch (err) {
+      // Show success anyway for UX (don't reveal if email exists or not)
+      setForgotSent(true);
+    }
+    setForgotLoading(false);
   };
 
   return (
@@ -90,41 +122,38 @@ export default function LoginPage() {
               className="w-20 h-20 rounded-2xl object-cover mx-auto shadow-lg border-2 border-gold/30"
             />
           </div>
-          <h1 className="font-display text-2xl font-light text-slate-800 dark:text-white">
-            B2B Partner Portal
+          <h1 className="font-display text-2xl font-light text-slate-800 dark:text-white transition-colors">
+            {loginType === 'admin' ? 'Admin Control Center' : 'B2B Partner Portal'}
           </h1>
-          <p className="text-sm text-slate-500 dark:text-white/40 mt-1">
-            Luxury Travel Management & Inquiry System
+          <p className="text-sm text-slate-500 dark:text-white/40 mt-1 transition-colors">
+            {loginType === 'admin' ? 'System Management & Oversight' : 'Luxury Travel Management & Inquiry System'}
           </p>
         </div>
 
         {/* Card */}
         <div className="glass-card p-6 sm:p-8 border-gold-300/30 dark:border-white/10 dark:bg-[#0D1117]/80 shadow-xl">
-          {/* Role Selectors */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
+
+          {/* Role Toggle */}
+          <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-xl mb-8 border border-slate-200 dark:border-white/10">
             <button
-              type="button"
-              onClick={() => setRole('agent')}
-              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all ${
-                role === 'agent'
-                  ? 'bg-gold/10 border-gold/40 text-gold shadow-[0_0_15px_rgba(201,168,76,0.15)]'
-                  : 'bg-slate-100/50 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-100 dark:hover:bg-white/10'
+              onClick={() => { setLoginType('agent'); setError(''); }}
+              className={`flex-1 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all ${
+                loginType === 'agent'
+                  ? 'bg-white dark:bg-[#0D1117] text-gold shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                  : 'text-slate-500 dark:text-white/40 hover:text-slate-800 dark:hover:text-white/80'
               }`}
             >
-              <User size={18} className={role === 'agent' ? 'text-gold' : ''} />
-              <span className="text-xs font-semibold tracking-wider uppercase">Travel Agent</span>
+              Travel Agent
             </button>
             <button
-              type="button"
-              onClick={() => setRole('admin')}
-              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all ${
-                role === 'admin'
-                  ? 'bg-gold/10 border-gold/40 text-gold shadow-[0_0_15px_rgba(201,168,76,0.15)]'
-                  : 'bg-slate-100/50 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-100 dark:hover:bg-white/10'
+              onClick={() => { setLoginType('admin'); setError(''); }}
+              className={`flex-1 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all ${
+                loginType === 'admin'
+                  ? 'bg-white dark:bg-[#0D1117] text-gold shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                  : 'text-slate-500 dark:text-white/40 hover:text-slate-800 dark:hover:text-white/80'
               }`}
             >
-              <ShieldAlert size={18} className={role === 'admin' ? 'text-gold' : ''} />
-              <span className="text-xs font-semibold tracking-wider uppercase">Administrator</span>
+              Administrator
             </button>
           </div>
 
@@ -153,9 +182,18 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="text-slate-400 dark:text-white/40 text-[10px] tracking-wider uppercase block mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-slate-400 dark:text-white/40 text-[10px] tracking-wider uppercase">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => { setShowForgot(true); setForgotEmail(email); setForgotSent(false); setForgotError(''); }}
+                  className="text-gold text-[10px] tracking-wider uppercase font-semibold hover:underline"
+                >
+                  Forgot Password?
+                </button>
+              </div>
               <div className="relative">
                 <Lock size={15} className="absolute left-4 top-3.5 text-slate-400 dark:text-white/30" />
                 <input
@@ -192,33 +230,27 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* JWT Badge */}
-          <div className="flex items-center justify-center gap-1.5 mt-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] text-slate-400 dark:text-white/30 uppercase tracking-widest font-medium">
-              JWT Secured Session
-            </span>
-          </div>
+
 
           {/* Quick-Logins */}
           <div className="mt-5 pt-5 border-t border-slate-200 dark:border-white/5 text-center">
             <p className="text-[10px] text-slate-400 dark:text-white/30 uppercase tracking-widest mb-3">
               Demo Fast Pass Logins
             </p>
-            <div className="flex gap-3 justify-center">
+            <div className="flex justify-center gap-3">
               <button
                 onClick={() => handleQuickLogin('agent')}
                 disabled={loading}
                 className="px-4 py-2 text-xs rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-600 dark:text-white/70 border border-slate-200 dark:border-white/5 cursor-pointer font-medium transition-colors"
               >
-                🔑 Quick Agent
+                ✈️ Agent Demo
               </button>
               <button
                 onClick={() => handleQuickLogin('admin')}
                 disabled={loading}
                 className="px-4 py-2 text-xs rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-600 dark:text-white/70 border border-slate-200 dark:border-white/5 cursor-pointer font-medium transition-colors"
               >
-                🛡️ Quick Admin
+                🛡️ Admin Demo
               </button>
             </div>
           </div>
@@ -233,6 +265,111 @@ export default function LoginPage() {
           </div>
         </div>
       </motion.div>
+
+      {/* Forgot Password Modal */}
+      <AnimatePresence>
+        {showForgot && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowForgot(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-card w-full max-w-md p-8 border-gold-300/30 dark:border-white/10 dark:bg-[#0D1117]/95 shadow-2xl relative"
+            >
+              <button
+                onClick={() => setShowForgot(false)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="text-center mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center mx-auto mb-4">
+                  <KeyRound size={24} className="text-gold" />
+                </div>
+                <h3 className="font-display text-xl text-slate-800 dark:text-white">
+                  {forgotSent ? 'Check Your Email' : 'Reset Password'}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-white/40 mt-1">
+                  {forgotSent
+                    ? 'A password reset link has been sent to your email address.'
+                    : 'Enter the email associated with your account and we\'ll send a reset link.'}
+                </p>
+              </div>
+
+              {forgotSent ? (
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 size={32} className="text-emerald-400" />
+                  </div>
+                  <p className="text-sm text-slate-500 dark:text-white/50 mb-6">
+                    If an account with <strong className="text-gold">{forgotEmail}</strong> exists, you will receive reset instructions shortly.
+                  </p>
+                  <button onClick={() => setShowForgot(false)} className="btn-primary w-full py-3 text-sm font-semibold">
+                    Back to Login
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  {forgotError && (
+                    <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs text-center font-medium">
+                      {forgotError}
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-slate-400 dark:text-white/40 text-[10px] tracking-wider uppercase block mb-1.5">
+                      Email Address
+                    </label>
+                    <div className="relative">
+                      <Mail size={15} className="absolute left-4 top-3.5 text-slate-400 dark:text-white/30" />
+                      <input
+                        type="email"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        placeholder="Enter your registered email"
+                        className="input-luxury pl-11"
+                        disabled={forgotLoading}
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    className="btn-primary w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wider uppercase disabled:opacity-60"
+                  >
+                    {forgotLoading ? (
+                      <div className="flex items-center gap-2">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                          className="w-4 h-4 border-2 border-obsidian/30 border-t-obsidian rounded-full"
+                        />
+                        Sending...
+                      </div>
+                    ) : (
+                      <>
+                        <Mail size={14} />
+                        Send Reset Link
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

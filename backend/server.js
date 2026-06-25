@@ -56,6 +56,10 @@ app.use(
 app.use(express.json({ limit: '10kb' })); // limit request body size
 app.use(express.urlencoded({ extended: true }));
 
+// ─── Static Files ────────────────────────────────────────────────────────────
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // ─── MongoDB Connection ──────────────────────────────────────────────────────
 const connectDB = async () => {
   try {
@@ -82,8 +86,8 @@ app.get('/api/health', (req, res) => {
 
 // ─── API Routes ──────────────────────────────────────────────────────────────
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/inquiries', require('./routes/inquiryRoutes'));
-app.use('/api/surveys', require('./routes/surveyRoutes'));
 app.use('/api/stats', require('./routes/statsRoutes'));
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────

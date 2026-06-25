@@ -1,0 +1,79 @@
+# ─────────────────────────────────────────────────────────
+# Karawaan — CI Pipeline (GitHub Actions)
+#
+# Runs on every push to main and on pull requests.
+# Vercel and Render handle actual deployment automatically.
+# This pipeline validates code quality before deploy.
+# ─────────────────────────────────────────────────────────
+
+name: Karawaan CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─── Backend Validation ─────────────────────────────────
+  backend:
+    name: Backend — Install & Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Security audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      # Uncomment when tests are added:
+      # - name: Run tests
+      #   run: npm test
+      #   env:
+      #     NODE_ENV: test
+
+  # ─── Frontend Validation ────────────────────────────────
+  frontend:
+    name: Frontend — Build & Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+      - name: Build production bundle
+        run: npm run build
+        env:
+          VITE_API_URL: https://placeholder.onrender.com

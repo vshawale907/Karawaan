@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────────────────
+# Karawaan Backend — Render Blueprint (Infrastructure as Code)
+# https://render.com/docs/blueprint-spec
+#
+# This file defines the backend service configuration.
+# Connect your GitHub repo to Render and it will auto-detect this file.
+# ─────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: karawaan-api
+    runtime: node
+    region: singapore  # Closest to Mumbai, India
+    plan: starter      # $7/month — always-on, no cold starts
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    autoDeploy: true   # Auto-deploy on push to main branch
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "5000"
+      - key: MONGODB_URI
+        sync: false  # Must be set manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true  # Render auto-generates a secure random value
+      - key: JWT_EXPIRES_IN
+        value: "7d"
+      - key: EMAIL_USER
+        sync: false  # Must be set manually — client's Gmail
+      - key: EMAIL_PASS
+        sync: false  # Must be set manually — client's App Password
+      - key: ADMIN_EMAIL
+        sync: false  # Must be set manually — admin notification email
+      - key: FRONTEND_URL
+        sync: false  # Must be set manually — e.g., https://karawaan.com

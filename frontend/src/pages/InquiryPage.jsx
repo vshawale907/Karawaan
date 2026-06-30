@@ -90,7 +90,7 @@ export default function InquiryPage() {
           </motion.div>
           <p className="text-gold text-xs tracking-widest uppercase mb-2">Inquiry Successfully Submitted</p>
           <h2 className="font-display text-3xl text-white mb-4">Request Received</h2>
-          
+
           <div className="bg-white/5 border border-white/10 rounded-xl p-5 mb-6">
             <p className="text-white/40 text-xs mb-1">Inquiry Reference ID</p>
             <p className="font-display text-2xl text-gold font-bold tracking-wider">{inquiryId}</p>
@@ -128,14 +128,14 @@ export default function InquiryPage() {
 
         <FadeUp>
           <form onSubmit={handleSubmit} className="glass-card-dark p-8 md:p-12 space-y-10 border border-white/5 shadow-2xl">
-            
+
             {/* 1. Destination & Dates */}
             <div>
               <div className="flex items-center gap-3 mb-6 pb-2 border-b border-white/5">
                 <MapPin size={18} className="text-gold" />
                 <h2 className="text-white font-semibold text-lg">Destination & Travel Dates</h2>
               </div>
-              
+
               <div className="mb-6">
                 <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-2">Travel Start Date *</label>
                 <input required type="date" value={form.dateFrom} onChange={e => set('dateFrom', e.target.value)}
@@ -179,7 +179,7 @@ export default function InquiryPage() {
                     </div>
                   </div>
                 ))}
-                
+
                 <button type="button" onClick={addDestination} className="text-gold text-xs flex items-center gap-2 hover:text-gold/80 transition-colors mt-4 py-2 px-4 rounded-lg bg-gold/10 hover:bg-gold/20 w-fit">
                   <Plus size={14} />
                   Add Another Destination
@@ -224,7 +224,7 @@ export default function InquiryPage() {
                   <textarea required value={form.roomRequirement} onChange={e => set('roomRequirement', e.target.value)}
                     placeholder="e.g. 03 Double Rooms with child sharing" rows={2} className="input-luxury resize-none" />
                 </div>
-                
+
                 <div>
                   <label className="text-white/40 text-[10px] tracking-wider uppercase block mb-3">Hotel Category Required *</label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -256,7 +256,7 @@ export default function InquiryPage() {
                 <User size={18} className="text-gold" />
                 <h2 className="text-white font-semibold text-lg">Contact Details</h2>
               </div>
-              
+
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
